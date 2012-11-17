@@ -1,0 +1,6 @@
+<RCC>
+	<qresource>
+		<file>blubb.wav</file>
+		<file alias="blubbels.png">icons/64x64/blubbels.png</file>
+    </qresource>
+</RCC>
