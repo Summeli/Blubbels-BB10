@@ -72,7 +72,7 @@ Box GameWidget::getGridPos(int x, int y)
 	x -= xoff; y -= yoff;
 
 	if(x >=0 and y >= 0
-	and (x-margin/2) / (bubblesize+margin) < grid_size and (y-margin/2) / (bubblesize+margin) < grid_size
+	and (x-margin/2) / (bubblesize+margin) < grid_size_x and (y-margin/2) / (bubblesize+margin) < grid_size_y
 	and grid[(x-margin/2)/(bubblesize+margin)][(y-margin/2)/(bubblesize+margin)].color) {
 		result.x = (x-margin/2) / (bubblesize+margin);
 		result.y = (y-margin/2) / (bubblesize+margin);
@@ -85,8 +85,8 @@ Box GameWidget::getGridPos(int x, int y)
 void GameWidget::animationStep()
 {
 	bool animations_found = false;
-	for(int x = 0; x < grid_size; x++) {
-		for(int y = 0; y < grid_size; y++) {
+	for(int x = 0; x < grid_size_x; x++) {
+		for(int y = 0; y < grid_size_y; y++) {
 			if(grid[x][y].yoffset) {
 				grid[x][y].yoffset -= grid[x][y].yspeed;
 				grid[x][y].yspeed *= 1.7;
@@ -124,12 +124,12 @@ void GameWidget::animationStep()
 //let bubbles fall down / move stacks to right
 void GameWidget::compressBubbles()
 {
-	for(int x = grid_size-1; x >= 0; x--) {
+	for(int x = grid_size_x-1; x >= 0; x--) {
 		int hole = -1;
 		int holes = 0;
 		bool bubble_found = false;
-		for(int y = 0; y <= grid_size; y++) {
-			if(y == grid_size or grid[x][y].color) { //not empty
+		for(int y = 0; y <= grid_size_y; y++) {
+			if(y == grid_size_y or grid[x][y].color) { //not empty
 				if(holes) { //hole found, move bubbles down
 					for(int i = hole; i > 0; i--) {
 						grid[x][i] = grid[x][i-holes];
@@ -152,12 +152,12 @@ void GameWidget::compressBubbles()
 		}
 	}
 
-	for(int x = grid_size-1; x >= 0; x--) {
-		if(!grid[x][grid_size-1].color) { //collumn empty
+	for(int x = grid_size_x-1; x >= 0; x--) {
+		if(!grid[x][grid_size_x-1].color) { //collumn empty
 			//shift remaining collums
 			int x2 = x;
 			while(--x2 >= 0) {
-				for(int y = 0; y < grid_size; y++) {
+				for(int y = 0; y < grid_size_y; y++) {
 					grid[x2+1][y] = grid[x2][y];
 
 					if(use_animations) {
@@ -168,8 +168,8 @@ void GameWidget::compressBubbles()
 			}
 
 			//add new collumn
-			const int height = int(double(rand())/(RAND_MAX + 1.0)*grid_size);
-			for(int y = grid_size-1; y >= height; y--) {
+			const int height = int(double(rand())/(RAND_MAX + 1.0)*grid_size_y);
+			for(int y = grid_size_y-1; y >= height; y--) {
 				grid[0][y] = Bubble(double(rand())/(RAND_MAX + 1.0)*num_colors+1);
 
 				if(use_animations) {
@@ -207,7 +207,7 @@ void GameWidget::getConnectedBubbles(Box pos, QList<Box> &list)
 		getConnectedBubbles(Box(x, y), list);
 	}
 	x += 2; //right
-	if(x < grid_size and color == grid[x][y].color and !list.contains(Box(x, y))) {
+	if(x < grid_size_x and color == grid[x][y].color and !list.contains(Box(x, y))) {
 		getConnectedBubbles(Box(x, y), list);
 	}
 	x--; y--; //up
@@ -215,7 +215,7 @@ void GameWidget::getConnectedBubbles(Box pos, QList<Box> &list)
 		getConnectedBubbles(Box(x, y), list);
 	}
 	y += 2; //down
-	if(y < grid_size and color == grid[x][y].color and !list.contains(Box(x, y))) {
+	if(y < grid_size_y and color == grid[x][y].color and !list.contains(Box(x, y))) {
 		getConnectedBubbles(Box(x, y), list);
 	}
 }
@@ -223,8 +223,8 @@ void GameWidget::getConnectedBubbles(Box pos, QList<Box> &list)
 
 void GameWidget::checkGameOver()
 {
-	for(int x = 0; x < grid_size; x++) {
-		for(int y = 0; y < grid_size; y++) {
+	for(int x = 0; x < grid_size_x; x++) {
+		for(int y = 0; y < grid_size_y; y++) {
 			QList<Box> connected;
 			getConnectedBubbles(Box(x,y), connected);
 			if(connected.size() > 1)
@@ -282,8 +282,8 @@ void GameWidget::mouseReleaseEvent(QMouseEvent *event)
 
 	//backup
 	oldscore = score;
-	for(int x = 0; x < grid_size; x++)
-		for(int y = 0; y < grid_size; y++)
+	for(int x = 0; x < grid_size_x; x++)
+		for(int y = 0; y < grid_size_y; y++)
 			old_grid[x][y] = grid[x][y];
 
 	foreach(Box pos, selection) {
@@ -312,11 +312,12 @@ void GameWidget::resizeEvent(QResizeEvent* /*event*/)
 	const int max_size = qMin(width(), height());
 
 	margin = max_size / 70; //separates bubbles from each other and the widget border
-	bubblesize = (max_size - margin*(grid_size+1)) / grid_size;
+	//TODO: this is weird math
+	bubblesize = (max_size - margin*(grid_size_x+1)) / grid_size_x;
 
 	//center grid
-	xoff = (width() - margin*(grid_size+1) - bubblesize*grid_size)/2;
-	yoff = (height() -margin*(grid_size+1) - bubblesize*grid_size)/2;
+	xoff = (width() - margin*(grid_size_x+1) - bubblesize*grid_size_x)/2;
+	yoff = (height() -margin*(grid_size_y+1) - bubblesize*grid_size_y)/2;
 
 	if(bubblesize != old_bubblesize) { //generate new pixmaps
 		for(int i = 1; i <= num_colors; i++) {
@@ -381,12 +382,12 @@ void GameWidget::restart()
 	selection.clear();
 
 	//seed field with random non-empty bubbles (values 1..num_colors)
-	for(int x = 0; x < grid_size; x++) {
-		for(int y = 0; y < grid_size; y++) {
+	for(int x = 0; x < grid_size_x; x++) {
+		for(int y = 0; y < grid_size_y; y++) {
 			grid[x][y] = Bubble(double(rand())/(RAND_MAX+1.0)*num_colors+1);
 
 			if(use_animations) {
-				grid[x][y].xoffset = grid_size + (width() - grid_size*(bubblesize+margin))/bubblesize/2;
+				grid[x][y].xoffset = grid_size_x + (width() - grid_size_x*(bubblesize+margin))/bubblesize/2;
 				grid[x][y].xspeed = initial_speed;
 			}
 		}
@@ -409,9 +410,9 @@ void GameWidget::undo()
 
 	if(use_animations) {
 		int shift = 0; //number of new collums in the action we want to undo
-		for(int x = grid_size-1; x >= shift; x--) {
+		for(int x = grid_size_x-1; x >= shift; x--) {
 			bool not_found = false;
-			for(int y = 1; y < grid_size; y++) {
+			for(int y = 1; y < grid_size_y; y++) {
 				if(grid[x][y].id == old_grid[x-shift][y].id)
 					break; //nothing changed
 
@@ -433,7 +434,7 @@ void GameWidget::undo()
 			}
 
 			if(shift > 0) {
-				for(int y = 0; y < grid_size; y++) {
+				for(int y = 0; y < grid_size_y; y++) {
 					old_grid[x-shift][y].xoffset = -shift;
 					old_grid[x-shift][y].xspeed = -initial_speed;
 				}
@@ -442,7 +443,7 @@ void GameWidget::undo()
 			//don't skip collumns
 			//TODO: only fixes special case shift=2
 			if(not_found and shift > 1) {
-				for(int y = 0; y < grid_size; y++) {
+				for(int y = 0; y < grid_size_y; y++) {
 					old_grid[x-shift+1][y].xoffset = -shift;
 					old_grid[x-shift+1][y].xspeed = -initial_speed;
 				}
@@ -452,8 +453,8 @@ void GameWidget::undo()
 		timer->start();
 	}
 
-	for(int x = 0; x < grid_size; x++)
-		for(int y = 0; y < grid_size; y++)
+	for(int x = 0; x < grid_size_x; x++)
+		for(int y = 0; y < grid_size_y; y++)
 			grid[x][y] = old_grid[x][y];
 
 	update();
@@ -473,8 +474,8 @@ void GameWidget::paintEvent(QPaintEvent* /*event*/)
 	painter.setFont(font);
 
 	//draw bubbles
-	for(int i = 0; i < grid_size; i++) {
-		for(int j = 0; j < grid_size; j++) {
+	for(int i = 0; i < grid_size_x; i++) {
+		for(int j = 0; j < grid_size_y; j++) {
 			if(!grid[i][j].color) //empty
 				continue;
 
@@ -514,7 +515,7 @@ void GameWidget::paintEvent(QPaintEvent* /*event*/)
 			path.lineTo(point);
 
 		}
-		if(b.x == grid_size-1 || grid[b.x+1][b.y].color != color) {
+		if(b.x == grid_size_x-1 || grid[b.x+1][b.y].color != color) {
 			QPointF point(b.x*(bubblesize+margin)+qreal(margin)*3/2+bubblesize, b.y*(bubblesize+margin)+qreal(margin)/2);
 			path.moveTo(point);
 			point.ry() += bubblesize+margin;
@@ -526,7 +527,7 @@ void GameWidget::paintEvent(QPaintEvent* /*event*/)
 			point.rx() += bubblesize+margin;
 			path.lineTo(point);
 		}
-		if(b.y == grid_size-1 || grid[b.x][b.y+1].color != color) {
+		if(b.y == grid_size_y-1 || grid[b.x][b.y+1].color != color) {
 			QPointF point(qreal(b.x*(bubblesize+margin)+margin/2), qreal(b.y*(bubblesize+margin)+margin*3/2+bubblesize));
 			path.moveTo(point);
 			point.rx() += bubblesize+margin;

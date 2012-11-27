@@ -122,7 +122,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	//restoreState(settings.value("window_state", saveState()).toByteArray());
 	//resize(settings.value("window_size", size()).toSize());
 	//move(settings.value("window_pos", pos()).toPoint());
-	setGeometry(40,0,1200,720);
+	//setGeometry(40,0,1200,720);
 	//resize(1200,720);
 	//move(0,0);
 
@@ -203,8 +203,9 @@ int main(int argc, char **argv)
 	translator.load(QString(SHARED_DIR) + "blubbels_" + QLocale::system().name());
 	app.installTranslator(&translator);
 */
+
 	MainWindow *mw = new MainWindow;
-	mw->show();
+	mw->showFullScreen();
 
 	return app.exec();
     }

@@ -77,12 +77,13 @@ private:
 	void getConnectedBubbles(Box pos, QList<Box> &list);
 	Box getGridPos(int x, int y);
 
-	const static int grid_size = 11;
+	const static int grid_size_x = 15;
+	const static int grid_size_y = 24;
 	const static int num_colors = 5;
 	const static int num_scale_steps = 10;
 
-	Bubble grid[grid_size][grid_size];
-	Bubble old_grid[grid_size][grid_size];
+	Bubble grid[grid_size_x][grid_size_y];
+	Bubble old_grid[grid_size_x][grid_size_y];
 	QList<Box> selection;
 	int bubblesize, margin, xoff, yoff;
 	int score, oldscore;
