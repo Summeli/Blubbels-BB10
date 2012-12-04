@@ -135,8 +135,7 @@ void MainWindow::about() {
 	QMessageBox::about(this, tr("About Blubbels"),
 		tr("<center><h1>Blubbels 1.0</h1>\
 A Jawbreaker&trade; clone written in Qt 4\
-<p>The original version of Blubbels can be found on <a href=\"http://sourceforge.net/projects/blubbels/\">http://sourceforge.net/projects/blubbels/</a>.</p>\
-<p>The BB10 version of Blubbels can be found on <a href=\"http://github.com/Summeli/Blubbels/\">http://github.com/Summeli/Blubbels/</a>.</p>\
+<p>The BB10 source code of Blubbels can be found on <a href=\"http://github.com/Summeli/Blubbels/\">http://github.com/Summeli/Blubbels/</a>.</p>\
 <small><p>&copy;2007-2010 Christian Pulvermacher &lt;pulvermacher@gmx.de&gt;<br>German Translation: &copy;2009 Dominic Hopf &lt;dh@dmaphy.de&gt;</p>\
 <p>BB10 port: Antti Pohjola &lt;summeli@summeli.fi&gt;</p></small></center>\
 %1")
