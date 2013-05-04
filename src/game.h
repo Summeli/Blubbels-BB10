@@ -77,8 +77,13 @@ private:
 	void getConnectedBubbles(Box pos, QList<Box> &list);
 	Box getGridPos(int x, int y);
 
+#ifdef Z10
 	const static int grid_size_x = 15;
 	const static int grid_size_y = 24;
+#else //Q10
+	const static int grid_size_x = 14;
+	const static int grid_size_y = 14;
+#endif
 	const static int num_colors = 5;
 	const static int num_scale_steps = 10;
 
